@@ -21,6 +21,7 @@ classDiagram
 
     class Calculator {
         -strategy: OperationStrategy
+        +Calculator(strategy: OperationStrategy)
         +setStrategy(strategy: OperationStrategy) void
         +calculate(a: double, b: double) double
     }
@@ -29,7 +30,10 @@ classDiagram
     class SubtractStrategy
     class MultiplyStrategy
     class DivideStrategy
-    class Main
+
+    class Main {
+        +main(args: String[]) void
+    }
 
     OperationStrategy <|.. AddStrategy
     OperationStrategy <|.. SubtractStrategy
@@ -41,77 +45,173 @@ classDiagram
     Main --> OperationStrategy
 ```
 
-The `OperationStrategy` interface defines the common method.
+The `OperationStrategy` interface defines the common method for all operations.
 
-Each strategy implements one operation. The `Calculator` class uses the selected strategy, and `Main` handles user input.
+The four strategy classes implement different calculations.
+
+`Calculator` is the Context. It stores the current strategy and calls its method.
+
+`Main` is the Client. It selects the strategy based on user input.
 
 ## 3. Clean Code Principles
 
 ### 3.1. Polymorphism Instead of Conditionals
 
-Without Strategy, the calculator could use many if-else statements:
+Without the Strategy Pattern, the calculator could use multiple if-else statements to choose an operation.
 
-`if (choice.equals("1")) result = a + b;`
+Before (simplified example):
 
-In my implementation, I use:
+```java
+if (choice.equals("1")) {
+    result = a + b;
+} else if (choice.equals("2")) {
+    result = a - b;
+}
+```
 
-`OperationStrategy strategy = strategies.get(choice);`
+After:
 
-Each operation has its own class. The calculator does not need to check which operation is selected.
+```java
+OperationStrategy strategy = strategies.get(choice);
+calculator.setStrategy(strategy);
+double result = calculator.calculate(a, b);
+```
+
+Now each operation has its own class. The `Calculator` class does not need if-else statements to choose an algorithm. The `Main` class still checks for invalid user input.
 
 ### 3.2. Meaningful Names
 
-I used simple class names such as `AddStrategy`, `SubtractStrategy`, `MultiplyStrategy`, and `DivideStrategy`.
+Class names should clearly describe their purpose.
 
-For example:
+Before (example of unclear naming):
 
-`new AddStrategy()`
+```java
+class Operation1 {
+}
+```
 
-It is easy to understand what this class does just by reading its name.
+After:
+
+```java
+public class AddStrategy implements OperationStrategy {
+    @Override
+    public double calculate(double a, double b) {
+        return a + b;
+    }
+}
+```
+
+I used names like `AddStrategy`, `SubtractStrategy`, `MultiplyStrategy`, and `DivideStrategy`.
+
+These names make the program easier to read because each class name describes its operation.
 
 ### 3.3. Single Responsibility Principle
 
-Each strategy class has one responsibility.
+Each class should have one main responsibility.
 
-For example, `AddStrategy` only performs addition:
+Before (example with mixed responsibilities):
 
-`return a + b;`
+```java
+public double calculate(double a, double b) {
+    System.out.println("Calculating...");
+    return a + b;
+}
+```
 
-It does not handle input, menus, or other operations.
+After (`AddStrategy.java`):
+
+```java
+public double calculate(double a, double b) {
+    return a + b;
+}
+```
+
+In my project, `AddStrategy` only performs addition.
+
+`Main` handles user input and output. `Calculator` delegates calculations to the selected strategy.
+
+This makes the classes smaller and easier to understand.
 
 ### 3.4. Encapsulation
 
-The `Calculator` class stores its strategy in a private variable:
+Encapsulation helps protect the internal data of a class.
 
-`private OperationStrategy strategy;`
+Before (example with a public field):
 
-It calls the selected algorithm using:
+```java
+public OperationStrategy strategy;
+```
 
-`return strategy.calculate(a, b);`
+After (`Calculator.java`):
 
-This means the calculator does not need to know how each operation works internally.
+```java
+private OperationStrategy strategy;
+
+public void setStrategy(OperationStrategy strategy) {
+    this.strategy = strategy;
+}
+```
+
+The strategy field is private, so other classes cannot change it directly.
+
+Instead, they use the `setStrategy()` method.
+
+The calculator executes the selected operation through:
+
+```java
+return strategy.calculate(a, b);
+```
+
+This keeps the internal implementation hidden from the client.
 
 ### 3.5. Open/Closed Principle
 
-The calculator can support new operations without changing the `Calculator` class.
+The Open/Closed Principle means that classes should support extension without changing their existing logic.
 
-For example, I added `DivideStrategy` as another implementation of `OperationStrategy`.
+Before (example with operations inside the context):
 
-The strategy can be changed using:
+```java
+if (choice.equals("1")) {
+    return a + b;
+} else if (choice.equals("2")) {
+    return a - b;
+}
+```
 
-`calculator.setStrategy(new DivideStrategy());`
+After (`DivideStrategy.java`):
 
-This makes the program easier to extend.
+```java
+public class DivideStrategy implements OperationStrategy {
+    @Override
+    public double calculate(double a, double b) {
+        if (b == 0) {
+            throw new ArithmeticException("Cannot divide by zero");
+        }
+
+        return a / b;
+    }
+}
+```
+
+To use this strategy, the client can write:
+
+```java
+calculator.setStrategy(new DivideStrategy());
+```
+
+I can add new mathematical operations by creating new strategy classes.
+
+I only need to update the menu in `Main` to make a new strategy selectable. The existing `Calculator` class does not need to change.
 
 ## 4. Strategy vs. State Pattern
 
 Strategy and State patterns have similar structures, but they have different purposes.
 
-Strategy is used when we want to choose between different algorithms. In my calculator, the user selects an operation.
+Strategy is used when we want to choose between different algorithms. In my calculator, the user selects a mathematical operation.
 
-State is used when an object's behavior changes depending on its internal state.
+State is used when an object's behavior depends on its internal state. A state change can also affect which behavior is used next.
 
-I used Strategy because the calculator needs interchangeable mathematical operations, not different internal states.
+I chose Strategy because the user can select and switch between independent mathematical operations. The calculator does not have a state machine.
 
 ## 5. Conclusion
 
@@ -124,4 +224,10 @@ The disadvantage is that I need to create more classes, even for simple operatio
 Overall, the Strategy Pattern makes the program more flexible and easier to understand.
 
 ## 6. GitHub Repository
+
 https://github.com/lonelysun21/SDP_5_assignment
+
+## References
+
+1. Ospanov, A. *Lecture 7: The Strategy Pattern*. Software Design Patterns course materials, Astana IT University.
+2. Refactoring.Guru. *Strategy Design Pattern*. https://refactoring.guru/design-patterns/strategy
