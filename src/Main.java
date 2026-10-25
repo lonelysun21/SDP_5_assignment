@@ -9,5 +9,8 @@ public class Main {
 
         calculator.setStrategy(new MultiplyStrategy());
         System.out.println("Multiplication: " + calculator.calculate(10, 5));
+
+        calculator.setStrategy(new DivideStrategy());
+        System.out.println("Division: " + calculator.calculate(10, 5));
     }
 }
