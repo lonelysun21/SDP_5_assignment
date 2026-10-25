@@ -1,0 +1,47 @@
+@startuml
+title Strategy Calculator
+
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam linetype ortho
+
+class Main {
+    +{static} main(args: String[]): void
+}
+
+class Calculator {
+    -strategy: OperationStrategy
+    +Calculator(strategy: OperationStrategy)
+    +setStrategy(strategy: OperationStrategy): void
+    +calculate(a: double, b: double): double
+}
+
+interface OperationStrategy {
+    +calculate(a: double, b: double): double
+}
+
+class AddStrategy {
+    +calculate(a: double, b: double): double
+}
+
+class SubtractStrategy {
+    +calculate(a: double, b: double): double
+}
+
+class MultiplyStrategy {
+    +calculate(a: double, b: double): double
+}
+
+class DivideStrategy {
+    +calculate(a: double, b: double): double
+}
+
+Main ..> Calculator : creates and uses
+Main ..> OperationStrategy : selects
+Calculator o--> OperationStrategy : delegates
+OperationStrategy <|.. AddStrategy
+OperationStrategy <|.. SubtractStrategy
+OperationStrategy <|.. MultiplyStrategy
+OperationStrategy <|.. DivideStrategy
+
+@enduml

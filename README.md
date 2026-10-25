@@ -50,3 +50,10 @@ The `Calculator` class stores the current strategy. The user can change the oper
 3. Add the new strategy to the menu in `Main.java`.
 
 The `Calculator` class does not need to be changed.
+
+## Documentation
+
+![Strategy Calculator UML Diagram](docs/strategy-uml.png)
+
+- [UML Diagram Source](docs/class-diagram.puml)
+- [Report](report.md)

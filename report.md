@@ -12,38 +12,9 @@ All operations implement the same interface called `OperationStrategy`. The `Cal
 
 ## 2. UML Class Diagram
 
-```mermaid
-classDiagram
-    class OperationStrategy {
-        <<interface>>
-        +calculate(a: double, b: double) double
-    }
+![Strategy Calculator UML Diagram](docs/strategy-uml.png)
 
-    class Calculator {
-        -strategy: OperationStrategy
-        +Calculator(strategy: OperationStrategy)
-        +setStrategy(strategy: OperationStrategy) void
-        +calculate(a: double, b: double) double
-    }
-
-    class AddStrategy
-    class SubtractStrategy
-    class MultiplyStrategy
-    class DivideStrategy
-
-    class Main {
-        +main(args: String[]) void
-    }
-
-    OperationStrategy <|.. AddStrategy
-    OperationStrategy <|.. SubtractStrategy
-    OperationStrategy <|.. MultiplyStrategy
-    OperationStrategy <|.. DivideStrategy
-
-    Calculator o--> OperationStrategy
-    Main --> Calculator
-    Main --> OperationStrategy
-```
+[PlantUML Source](docs/class-diagram.puml)
 
 The `OperationStrategy` interface defines the common method for all operations.
 
